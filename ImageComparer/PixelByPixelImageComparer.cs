@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Drawing;
 
 namespace ImageComparer
 {
-    public class PixelByPixelImageComparer
+    public class PixelByPixelImageComparer : IImageComparer
     {
         private readonly IPixelComparer _pixelComparer;
 
@@ -13,22 +15,9 @@ namespace ImageComparer
             Threshold = threshold;
         }
 
-        public PixelByPixelImageComparer(Color backgroundColor, Color differenceColor, IPixelComparer pixelComparer,
-            int threshold)
-        {
-            BackgroundColor = backgroundColor;
-            DifferenceColor = differenceColor;
-            _pixelComparer = pixelComparer;
-            Threshold = threshold;
-        }
-
         public int Threshold { get; }
 
-        public Color BackgroundColor { get; } = Color.Transparent;
-
-        public Color DifferenceColor { get; } = Color.Red;
-
-        public Image Compare(Image left, Image right)
+        public SortedSet<Point> GetDifferences(Image left, Image right)
         {
             if (left == null)
                 throw new ArgumentNullException(nameof(left));
@@ -39,17 +28,15 @@ namespace ImageComparer
             if (left.Size != right.Size)
                 throw new ArgumentException("Source images must be of the same size.");
 
-            var result = new Bitmap(left.Width, left.Height);
-
             var bmLeft = left as Bitmap;
             var bmRight = right as Bitmap;
+            
+            var result = new SortedSet<Point>(new PointComparer());
 
             for (var x = 0; x < bmLeft.Width; x++)
             for (var y = 0; y < bmLeft.Height; y++)
-                result.SetPixel(x, y,
-                    _pixelComparer.PixelEquals(bmLeft.GetPixel(x, y), bmRight.GetPixel(x, y), Threshold)
-                        ? BackgroundColor
-                        : DifferenceColor);
+                if (!_pixelComparer.PixelEquals(bmLeft.GetPixel(x, y), bmRight.GetPixel(x, y), Threshold))
+                    result.Add(new Point(x, y));
 
             return result;
         }
