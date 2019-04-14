@@ -7,6 +7,8 @@ namespace ImageComparer
     {
         int Threshold { get; }
         
-        SortedSet<Point> GetDifferences(Image left, Image right);
+        IEnumerable<RectangleF> GetDifferences(Image left, Image right);
+
+        IAsyncEnumerable<RectangleF> GetDifferencesAsync(Image left, Image right);
     }
 }

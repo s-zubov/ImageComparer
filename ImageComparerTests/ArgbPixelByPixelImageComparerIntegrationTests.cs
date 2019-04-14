@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Linq;
 using ImageComparer;
 using NUnit.Framework;
 
@@ -41,7 +42,7 @@ namespace Tests
         }
 
         [Test]
-        public void Compare_EqualSolidSource_ReturnsEmptySet()
+        public void GetDifferences_EqualSolidSource_ReturnsEmptySet()
         {
             var cyanRect = CreateSolidRectangle(Width, Height, Color.Cyan);
 
@@ -49,7 +50,7 @@ namespace Tests
         }
 
         [Test]
-        public void Compare_DifferentByAlphaGreaterThanThresholdSolidSource_ReturnsAllPoints()
+        public void GetDifferences_DifferentByAlphaGreaterThanThresholdSolidSource_ReturnsAllPoints()
         {
             var leftColor = Color.FromArgb(Value, Value, Value, Value);
             var rightColor = Color.FromArgb(GreaterThanThresholdValue, Value, Value, Value);
@@ -57,17 +58,17 @@ namespace Tests
             var leftRect = CreateSolidRectangle(Width, Height, leftColor);
             var rightRect = CreateSolidRectangle(Width, Height, rightColor);
 
-            var result = _comparer.GetDifferences(leftRect, rightRect);
+            var result = _comparer.GetDifferences(leftRect, rightRect).ToList();
 
             Assert.AreEqual(Width * Height, result.Count);
             
             for (var x = 0; x < Width; x++)
             for (var y = 0; y < Height; y++)
-                Assert.IsTrue(result.Contains(new Point(x, y)));;
+                Assert.IsTrue(result.Contains(new Rectangle(x, y, 1, 1)));
         }
 
         [Test]
-        public void Compare_DifferentByRgbGreaterThanThresholdSolidSource_ReturnsAllPoints()
+        public void GetDifferences_DifferentByRgbGreaterThanThresholdSolidSource_ReturnsAllPoints()
         {
             var leftColor = Color.FromArgb(Value, Value, Value, Value);
             var rightColor = Color.FromArgb(Value, GreaterThanThresholdValue, GreaterThanThresholdValue, GreaterThanThresholdValue);
@@ -75,17 +76,17 @@ namespace Tests
             var leftRect = CreateSolidRectangle(Width, Height, leftColor);
             var rightRect = CreateSolidRectangle(Width, Height, rightColor);
 
-            var result = _comparer.GetDifferences(leftRect, rightRect);
+            var result = _comparer.GetDifferences(leftRect, rightRect).ToList();
 
             Assert.AreEqual(Width * Height, result.Count);
             
             for (var x = 0; x < Width; x++)
             for (var y = 0; y < Height; y++)
-                Assert.IsTrue(result.Contains(new Point(x, y)));
+                Assert.IsTrue(result.Contains(new Rectangle(x, y, 1, 1)));
         }
 
         [Test]
-        public void Compare_DifferentByArgbGreaterThanThresholdSolidSource_ReturnsAllPoints()
+        public void GetDifferences_DifferentByArgbGreaterThanThresholdSolidSource_ReturnsAllPoints()
         {
             var leftColor = Color.FromArgb(Value, Value, Value, Value);
             var rightColor = Color.FromArgb(GreaterThanThresholdValue, GreaterThanThresholdValue, GreaterThanThresholdValue, GreaterThanThresholdValue);
@@ -93,17 +94,17 @@ namespace Tests
             var leftRect = CreateSolidRectangle(Width, Height, leftColor);
             var rightRect = CreateSolidRectangle(Width, Height, rightColor);
 
-            var result = _comparer.GetDifferences(leftRect, rightRect);
+            var result = _comparer.GetDifferences(leftRect, rightRect).ToList();
             
             Assert.AreEqual(Width * Height, result.Count);
             
             for (var x = 0; x < Width; x++)
             for (var y = 0; y < Height; y++)
-                Assert.IsTrue(result.Contains(new Point(x, y)));
+                Assert.IsTrue(result.Contains(new Rectangle(x, y, 1, 1)));
         }
 
         [Test]
-        public void Compare_DifferentSolidAndRandomSource_ReturnsAllRandomPoints()
+        public void GetDifferences_DifferentSolidAndRandomSource_ReturnsAllRandomPoints()
         {
             var cyanRect = CreateSolidRectangle(Width, Height, Color.Cyan);
 
@@ -118,13 +119,101 @@ namespace Tests
                     bmMagentaPixelsOnCyanBg.SetPixel(x, y, Color.Magenta);
                 }
 
-            var result = _comparer.GetDifferences(cyanRect, magentaPixelsOnCyanBg);
+            var result = _comparer.GetDifferences(cyanRect, magentaPixelsOnCyanBg).ToList();
             
             Assert.AreEqual(randomPointsCount, result.Count);
             
             for (var x = 0; x < Width; x++)
             for (var y = 0; y < Height; y++)
-                Assert.IsTrue(result.Contains(new Point(x, y)));
+                Assert.IsTrue(result.Contains(new Rectangle(x, y, 1, 1)));
+        }
+        
+        
+                [Test]
+        public void GetDifferencesAsync_EqualSolidSource_ReturnsEmptySet()
+        {
+            var cyanRect = CreateSolidRectangle(Width, Height, Color.Cyan);
+
+            Assert.IsEmpty(_comparer.GetDifferencesAsync(cyanRect, cyanRect).IterateToListAsync().Result);
+        }
+
+        [Test]
+        public void GetDifferencesAsync_DifferentByAlphaGreaterThanThresholdSolidSource_ReturnsAllPoints()
+        {
+            var leftColor = Color.FromArgb(Value, Value, Value, Value);
+            var rightColor = Color.FromArgb(GreaterThanThresholdValue, Value, Value, Value);
+
+            var leftRect = CreateSolidRectangle(Width, Height, leftColor);
+            var rightRect = CreateSolidRectangle(Width, Height, rightColor);
+
+            var result = _comparer.GetDifferencesAsync(leftRect, rightRect).IterateToListAsync().Result;
+
+            Assert.AreEqual(Width * Height, result.Count);
+            
+            for (var x = 0; x < Width; x++)
+            for (var y = 0; y < Height; y++)
+                Assert.IsTrue(result.Contains(new Rectangle(x, y, 1, 1)));
+        }
+
+        [Test]
+        public void GetDifferencesAsync_DifferentByRgbGreaterThanThresholdSolidSource_ReturnsAllPoints()
+        {
+            var leftColor = Color.FromArgb(Value, Value, Value, Value);
+            var rightColor = Color.FromArgb(Value, GreaterThanThresholdValue, GreaterThanThresholdValue, GreaterThanThresholdValue);
+
+            var leftRect = CreateSolidRectangle(Width, Height, leftColor);
+            var rightRect = CreateSolidRectangle(Width, Height, rightColor);
+
+            var result = _comparer.GetDifferencesAsync(leftRect, rightRect).IterateToListAsync().Result;
+
+            Assert.AreEqual(Width * Height, result.Count);
+            
+            for (var x = 0; x < Width; x++)
+            for (var y = 0; y < Height; y++)
+                Assert.IsTrue(result.Contains(new Rectangle(x, y, 1, 1)));
+        }
+
+        [Test]
+        public void GetDifferencesAsync_DifferentByArgbGreaterThanThresholdSolidSource_ReturnsAllPoints()
+        {
+            var leftColor = Color.FromArgb(Value, Value, Value, Value);
+            var rightColor = Color.FromArgb(GreaterThanThresholdValue, GreaterThanThresholdValue, GreaterThanThresholdValue, GreaterThanThresholdValue);
+
+            var leftRect = CreateSolidRectangle(Width, Height, leftColor);
+            var rightRect = CreateSolidRectangle(Width, Height, rightColor);
+
+            var result = _comparer.GetDifferencesAsync(leftRect, rightRect).IterateToListAsync().Result;
+            
+            Assert.AreEqual(Width * Height, result.Count);
+            
+            for (var x = 0; x < Width; x++)
+            for (var y = 0; y < Height; y++)
+                Assert.IsTrue(result.Contains(new Rectangle(x, y, 1, 1)));
+        }
+
+        [Test]
+        public void GetDifferencesAsync_DifferentSolidAndRandomSource_ReturnsAllRandomPoints()
+        {
+            var cyanRect = CreateSolidRectangle(Width, Height, Color.Cyan);
+
+            var magentaPixelsOnCyanBg = CreateSolidRectangle(Width, Height, Color.Cyan);
+            var bmMagentaPixelsOnCyanBg = magentaPixelsOnCyanBg as Bitmap;
+            var randomPointsCount = 0;
+            for (var x = 0; x < bmMagentaPixelsOnCyanBg.Width; x++)
+            for (var y = 0; y < bmMagentaPixelsOnCyanBg.Height; y++)
+                if (_rnd.Next(1, 2) == 1)
+                {
+                    randomPointsCount++;
+                    bmMagentaPixelsOnCyanBg.SetPixel(x, y, Color.Magenta);
+                }
+
+            var result = _comparer.GetDifferencesAsync(cyanRect, magentaPixelsOnCyanBg).IterateToListAsync().Result;
+            
+            Assert.AreEqual(randomPointsCount, result.Count);
+            
+            for (var x = 0; x < Width; x++)
+            for (var y = 0; y < Height; y++)
+                Assert.IsTrue(result.Contains(new Rectangle(x, y, 1, 1)));
         }
     }
 }
