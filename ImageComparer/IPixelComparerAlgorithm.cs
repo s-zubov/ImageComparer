@@ -2,7 +2,7 @@ using System.Drawing;
 
 namespace ImageComparer
 {
-    public interface IPixelComparer
+    public interface IPixelComparerAlgorithm
     {
         bool PixelEquals(Color left, Color right);
         

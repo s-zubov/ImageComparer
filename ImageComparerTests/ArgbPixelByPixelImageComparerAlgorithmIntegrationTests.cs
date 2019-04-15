@@ -6,9 +6,9 @@ using NUnit.Framework;
 
 namespace Tests
 {
-    public class ArgbPixelByPixelImageComparerIntegrationTests
+    public class ArgbPixelByPixelImageComparerAlgorithmIntegrationTests
     {
-        private IImageComparer _comparer;
+        private IImageComparerAlgorithm _comparerAlgorithm;
         
         private Random _rnd;
 
@@ -28,7 +28,7 @@ namespace Tests
         public void Setup()
         {
             _lockObject = new object();   
-            _comparer = new PixelByPixelImageComparer(new ArgbPixelComparer(), Threshold);
+            _comparerAlgorithm = new PixelByPixelImageComparerAlgorithm(new ArgbPixelComparerAlgorithm(), Threshold);
             _rnd = new Random(1);
         }
 
@@ -49,7 +49,7 @@ namespace Tests
         {
             var cyanRect = CreateSolidRectangle(Width, Height, Color.Cyan);
 
-            Assert.IsEmpty(_comparer.GetDifferences(cyanRect, cyanRect));
+            Assert.IsEmpty(_comparerAlgorithm.GetDifferences(cyanRect, cyanRect));
         }
 
         [Test]
@@ -61,7 +61,7 @@ namespace Tests
             var leftRect = CreateSolidRectangle(Width, Height, leftColor);
             var rightRect = CreateSolidRectangle(Width, Height, rightColor);
 
-            var result = _comparer.GetDifferences(leftRect, rightRect).ToList();
+            var result = _comparerAlgorithm.GetDifferences(leftRect, rightRect).ToList();
 
             Assert.AreEqual(Width * Height, result.Count);
             
@@ -79,7 +79,7 @@ namespace Tests
             var leftRect = CreateSolidRectangle(Width, Height, leftColor);
             var rightRect = CreateSolidRectangle(Width, Height, rightColor);
 
-            var result = _comparer.GetDifferences(leftRect, rightRect).ToList();
+            var result = _comparerAlgorithm.GetDifferences(leftRect, rightRect).ToList();
 
             Assert.AreEqual(Width * Height, result.Count);
             
@@ -97,7 +97,7 @@ namespace Tests
             var leftRect = CreateSolidRectangle(Width, Height, leftColor);
             var rightRect = CreateSolidRectangle(Width, Height, rightColor);
 
-            var result = _comparer.GetDifferences(leftRect, rightRect).ToList();
+            var result = _comparerAlgorithm.GetDifferences(leftRect, rightRect).ToList();
             
             Assert.AreEqual(Width * Height, result.Count);
             
@@ -122,7 +122,7 @@ namespace Tests
                     bmMagentaPixelsOnCyanBg.SetPixel(x, y, Color.Magenta);
                 }
 
-            var result = _comparer.GetDifferences(cyanRect, magentaPixelsOnCyanBg).ToList();
+            var result = _comparerAlgorithm.GetDifferences(cyanRect, magentaPixelsOnCyanBg).ToList();
             
             Assert.AreEqual(randomPointsCount, result.Count);
             
@@ -137,7 +137,7 @@ namespace Tests
         {
             var cyanRect = CreateSolidRectangle(Width, Height, Color.Cyan);
 
-            Assert.IsEmpty(_comparer.GetDifferencesAsync(cyanRect, cyanRect, _lockObject).IterateToListAsync().Result);
+            Assert.IsEmpty(_comparerAlgorithm.GetDifferencesAsync(cyanRect, cyanRect, _lockObject).ToListAsync().Result);
         }
 
         [Test]
@@ -149,7 +149,7 @@ namespace Tests
             var leftRect = CreateSolidRectangle(Width, Height, leftColor);
             var rightRect = CreateSolidRectangle(Width, Height, rightColor);
 
-            var result = _comparer.GetDifferencesAsync(leftRect, rightRect, _lockObject).IterateToListAsync().Result;
+            var result = _comparerAlgorithm.GetDifferencesAsync(leftRect, rightRect, _lockObject).ToListAsync().Result;
 
             Assert.AreEqual(Width * Height, result.Count);
             
@@ -167,7 +167,7 @@ namespace Tests
             var leftRect = CreateSolidRectangle(Width, Height, leftColor);
             var rightRect = CreateSolidRectangle(Width, Height, rightColor);
 
-            var result = _comparer.GetDifferencesAsync(leftRect, rightRect, _lockObject).IterateToListAsync().Result;
+            var result = _comparerAlgorithm.GetDifferencesAsync(leftRect, rightRect, _lockObject).ToListAsync().Result;
 
             Assert.AreEqual(Width * Height, result.Count);
             
@@ -185,7 +185,7 @@ namespace Tests
             var leftRect = CreateSolidRectangle(Width, Height, leftColor);
             var rightRect = CreateSolidRectangle(Width, Height, rightColor);
 
-            var result = _comparer.GetDifferencesAsync(leftRect, rightRect, _lockObject).IterateToListAsync().Result;
+            var result = _comparerAlgorithm.GetDifferencesAsync(leftRect, rightRect, _lockObject).ToListAsync().Result;
             
             Assert.AreEqual(Width * Height, result.Count);
             
@@ -210,7 +210,7 @@ namespace Tests
                     bmMagentaPixelsOnCyanBg.SetPixel(x, y, Color.Magenta);
                 }
 
-            var result = _comparer.GetDifferencesAsync(cyanRect, magentaPixelsOnCyanBg, _lockObject).IterateToListAsync().Result;
+            var result = _comparerAlgorithm.GetDifferencesAsync(cyanRect, magentaPixelsOnCyanBg, _lockObject).ToListAsync().Result;
             
             Assert.AreEqual(randomPointsCount, result.Count);
             

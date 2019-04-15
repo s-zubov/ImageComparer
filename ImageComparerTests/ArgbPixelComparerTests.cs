@@ -6,24 +6,24 @@ namespace Tests
 {
     public class ArgbPixelComparerTests
     {
-        private IPixelComparer _argbPixelComparer;
+        private IPixelComparerAlgorithm _argbPixelComparerAlgorithm;
 
         [SetUp]
         public void Setup()
         {
-            _argbPixelComparer = new ArgbPixelComparer();
+            _argbPixelComparerAlgorithm = new ArgbPixelComparerAlgorithm();
         }
 
         [Test]
         public void PixelEquals_SameColorNoThreshold_ReturnsTrue()
         {
-            Assert.IsTrue(_argbPixelComparer.PixelEquals(Color.Red, Color.Red));
+            Assert.IsTrue(_argbPixelComparerAlgorithm.PixelEquals(Color.Red, Color.Red));
         }
 
         [Test]
         public void PixelEquals_DifferentColorNoThreshold_ReturnsFalse()
         {
-            Assert.IsFalse(_argbPixelComparer.PixelEquals(Color.Red, Color.Tan));
+            Assert.IsFalse(_argbPixelComparerAlgorithm.PixelEquals(Color.Red, Color.Tan));
         }
 
         [Test]
@@ -32,25 +32,25 @@ namespace Tests
             var left = Color.FromArgb(10, 100, 100, 100);
             var right = Color.FromArgb(50, 100, 100, 100);
 
-            Assert.IsFalse(_argbPixelComparer.PixelEquals(left, right));
+            Assert.IsFalse(_argbPixelComparerAlgorithm.PixelEquals(left, right));
         }
 
         [Test]
         public void PixelEquals_SameColorZeroThreshold_ReturnsTrue()
         {
-            Assert.IsTrue(_argbPixelComparer.PixelEquals(Color.Red, Color.Red, 0));
+            Assert.IsTrue(_argbPixelComparerAlgorithm.PixelEquals(Color.Red, Color.Red, 0));
         }
 
         [Test]
         public void PixelEquals_DifferentColorZeroThreshold_ReturnsFalse()
         {
-            Assert.IsFalse(_argbPixelComparer.PixelEquals(Color.Red, Color.Tan, 0));
+            Assert.IsFalse(_argbPixelComparerAlgorithm.PixelEquals(Color.Red, Color.Tan, 0));
         }
 
         [Test]
         public void PixelEquals_SameColorWithThreshold_ReturnsTrue()
         {
-            Assert.IsTrue(_argbPixelComparer.PixelEquals(Color.Red, Color.Red, 1));
+            Assert.IsTrue(_argbPixelComparerAlgorithm.PixelEquals(Color.Red, Color.Red, 1));
         }
 
         [Test]
@@ -59,7 +59,7 @@ namespace Tests
             var left = Color.FromArgb(1, 100, 100, 100);
             var right = Color.FromArgb(2, 100, 100, 100);
 
-            Assert.IsTrue(_argbPixelComparer.PixelEquals(left, right, 2));
+            Assert.IsTrue(_argbPixelComparerAlgorithm.PixelEquals(left, right, 2));
         }
 
         [Test]
@@ -69,7 +69,7 @@ namespace Tests
             var left = Color.FromArgb(1, 100, 100, 100);
             var right = Color.FromArgb(1, 98, 98, 98);
 
-            Assert.IsTrue(_argbPixelComparer.PixelEquals(left, right, 4));
+            Assert.IsTrue(_argbPixelComparerAlgorithm.PixelEquals(left, right, 4));
         }
 
         [Test]
@@ -78,7 +78,7 @@ namespace Tests
             var left = Color.FromArgb(1, 100, 100, 100);
             var right = Color.FromArgb(2, 98, 98, 98);
 
-            Assert.IsTrue(_argbPixelComparer.PixelEquals(left, right, 5));
+            Assert.IsTrue(_argbPixelComparerAlgorithm.PixelEquals(left, right, 5));
         }
 
         [Test]
@@ -87,7 +87,7 @@ namespace Tests
             var left = Color.FromArgb(1, 100, 100, 100);
             var right = Color.FromArgb(2, 100, 100, 100);
 
-            Assert.IsTrue(_argbPixelComparer.PixelEquals(left, right, 1));
+            Assert.IsTrue(_argbPixelComparerAlgorithm.PixelEquals(left, right, 1));
         }
 
         [Test]
@@ -96,7 +96,7 @@ namespace Tests
             var left = Color.FromArgb(1, 100, 100, 100);
             var right = Color.FromArgb(1, 98, 100, 100);
 
-            Assert.IsTrue(_argbPixelComparer.PixelEquals(left, right, 2));
+            Assert.IsTrue(_argbPixelComparerAlgorithm.PixelEquals(left, right, 2));
         }
 
         [Test]
@@ -105,7 +105,7 @@ namespace Tests
             var left = Color.FromArgb(1, 100, 100, 100);
             var right = Color.FromArgb(2, 100, 98, 100);
 
-            Assert.IsTrue(_argbPixelComparer.PixelEquals(left, right, 3));
+            Assert.IsTrue(_argbPixelComparerAlgorithm.PixelEquals(left, right, 3));
         }
 
         [Test]
@@ -114,7 +114,7 @@ namespace Tests
             var left = Color.FromArgb(1, 100, 100, 100);
             var right = Color.FromArgb(3, 100, 100, 100);
 
-            Assert.IsFalse(_argbPixelComparer.PixelEquals(left, right, 1));
+            Assert.IsFalse(_argbPixelComparerAlgorithm.PixelEquals(left, right, 1));
         }
 
         [Test]
@@ -124,7 +124,7 @@ namespace Tests
             var left = Color.FromArgb(1, 100, 100, 100);
             var right = Color.FromArgb(1, 98, 98, 98);
 
-            Assert.IsFalse(_argbPixelComparer.PixelEquals(left, right, 3));
+            Assert.IsFalse(_argbPixelComparerAlgorithm.PixelEquals(left, right, 3));
         }
 
         [Test]
@@ -133,7 +133,7 @@ namespace Tests
             var left = Color.FromArgb(1, 100, 100, 100);
             var right = Color.FromArgb(2, 98, 98, 98);
 
-            Assert.IsFalse(_argbPixelComparer.PixelEquals(left, right, 4));
+            Assert.IsFalse(_argbPixelComparerAlgorithm.PixelEquals(left, right, 4));
         }
     }
 }

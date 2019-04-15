@@ -3,7 +3,7 @@ using System.Drawing;
 
 namespace ImageComparer
 {
-    public interface IImageComparer
+    public interface IImageComparerAlgorithm
     {
         int Threshold { get; }
         

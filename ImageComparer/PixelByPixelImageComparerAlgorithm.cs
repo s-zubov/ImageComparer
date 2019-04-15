@@ -5,13 +5,13 @@ using System.Drawing;
 
 namespace ImageComparer
 {
-    public class PixelByPixelImageComparer : IImageComparer
+    public class PixelByPixelImageComparerAlgorithm : IImageComparerAlgorithm
     {
-        private readonly IPixelComparer _pixelComparer;
+        private readonly IPixelComparerAlgorithm _pixelComparerAlgorithm;
 
-        public PixelByPixelImageComparer(IPixelComparer pixelComparer, int threshold)
+        public PixelByPixelImageComparerAlgorithm(IPixelComparerAlgorithm pixelComparerAlgorithm, int threshold)
         {
-            _pixelComparer = pixelComparer;
+            _pixelComparerAlgorithm = pixelComparerAlgorithm;
             Threshold = threshold;
         }
 
@@ -33,7 +33,7 @@ namespace ImageComparer
 
             for (var x = 0; x < bmLeft.Width; x++)
             for (var y = 0; y < bmLeft.Height; y++)
-                if (!_pixelComparer.PixelEquals(bmLeft.GetPixel(x, y), bmRight.GetPixel(x, y), Threshold))
+                if (!_pixelComparerAlgorithm.PixelEquals(bmLeft.GetPixel(x, y), bmRight.GetPixel(x, y), Threshold))
                     yield return new Rectangle(x, y, 1, 1);
         }
 
@@ -55,7 +55,7 @@ namespace ImageComparer
 
                 for (var x = 0; x < bmLeft.Width; x++)
                 for (var y = 0; y < bmLeft.Height; y++)
-                    if (!_pixelComparer.PixelEquals(bmLeft.GetPixel(x, y), bmRight.GetPixel(x, y), Threshold))
+                    if (!_pixelComparerAlgorithm.PixelEquals(bmLeft.GetPixel(x, y), bmRight.GetPixel(x, y), Threshold))
                         yield return new Rectangle(x, y, 1, 1);
             }
         }

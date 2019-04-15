@@ -5,13 +5,13 @@ using System.Linq;
 
 namespace ImageComparer
 {
-    public class GridImageComparer : IImageComparer
+    public class GridImageComparerAlgorithm : IImageComparerAlgorithm
     {
-        private readonly IImageComparer _pixelByPixelImageComparer;
+        private readonly IImageComparerAlgorithm _innerImageComparerAlgorithm;
 
-        public GridImageComparer(IImageComparer pixelByPixelImageComparer, int threshold, int xSplit, int ySplit)
+        public GridImageComparerAlgorithm(IImageComparerAlgorithm innerImageComparerAlgorithm, int xSplit, int ySplit)
         {
-            _pixelByPixelImageComparer = pixelByPixelImageComparer;
+            _innerImageComparerAlgorithm = innerImageComparerAlgorithm;
             XSplit = xSplit;
             YSplit = ySplit;
         }
@@ -20,7 +20,7 @@ namespace ImageComparer
 
         public int YSplit { get; }
 
-        public int Threshold => _pixelByPixelImageComparer.Threshold;
+        public int Threshold => _innerImageComparerAlgorithm.Threshold;
 
         public IEnumerable<RectangleF> GetDifferences(Image left, Image right)
         {
@@ -39,7 +39,7 @@ namespace ImageComparer
             var hashLeft = new Bitmap(left, new Size(XSplit, YSplit));
             var hashRight = new Bitmap(right, new Size(XSplit, YSplit));
 
-            return _pixelByPixelImageComparer.GetDifferences(hashLeft, hashRight)
+            return _innerImageComparerAlgorithm.GetDifferences(hashLeft, hashRight)
                 .Select(p => ScaleRectangle(p, xTransformFactor, yTransformFactor));
         }
 
@@ -67,7 +67,7 @@ namespace ImageComparer
                 hashRight = new Bitmap(right, new Size(XSplit, YSplit));
             }
 
-            var differences = _pixelByPixelImageComparer.GetDifferencesAsync(hashLeft, hashRight, lockObject);
+            var differences = _innerImageComparerAlgorithm.GetDifferencesAsync(hashLeft, hashRight, lockObject);
 
             await foreach (var rectangle in differences)
                 yield return ScaleRectangle(rectangle, xTransformFactor, yTransformFactor);

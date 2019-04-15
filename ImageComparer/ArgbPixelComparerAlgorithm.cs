@@ -3,7 +3,7 @@ using System.Drawing;
 
 namespace ImageComparer
 {
-    public class ArgbPixelComparer : IPixelComparer
+    public class ArgbPixelComparerAlgorithm : IPixelComparerAlgorithm
     {
         public bool PixelEquals(Color left, Color right)
         {
