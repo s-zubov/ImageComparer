@@ -22,7 +22,7 @@ namespace ImageComparer
 
         public int Threshold => _innerImageComparerAlgorithm.Threshold;
 
-        public IEnumerable<RectangleF> GetDifferences(Image left, Image right)
+        public IEnumerable<RectangleF> GetDifferences(Bitmap left, Bitmap right)
         {
             if (left == null)
                 throw new ArgumentNullException(nameof(left));
@@ -43,7 +43,7 @@ namespace ImageComparer
                 .Select(p => ScaleRectangle(p, xTransformFactor, yTransformFactor));
         }
 
-        public async IAsyncEnumerable<RectangleF> GetDifferencesAsync(Image left, Image right, object lockObject)
+        public async IAsyncEnumerable<RectangleF> GetDifferencesAsync(Bitmap left, Bitmap right, object lockObject)
         {
             if (left == null)
                 throw new ArgumentNullException(nameof(left));

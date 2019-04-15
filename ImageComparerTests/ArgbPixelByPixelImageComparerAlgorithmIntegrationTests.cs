@@ -32,7 +32,7 @@ namespace Tests
             _rnd = new Random(1);
         }
 
-        private static Image CreateSolidRectangle(int width, int height, Color color)
+        private static Bitmap CreateSolidRectangle(int width, int height, Color color)
         {
             var image = new Bitmap(width, height);
             using (var gfx = Graphics.FromImage(image))
