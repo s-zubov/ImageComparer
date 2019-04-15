@@ -19,9 +19,12 @@ namespace Tests
 
         private Mock<IPixelComparer> _pixelComparerMock;
 
+        private object _lockObject;
+
         [SetUp]
         public void Setup()
         {
+            _lockObject = new object();
             _pixelComparerMock = new Mock<IPixelComparer>();
             _comparer = new PixelByPixelImageComparer(_pixelComparerMock.Object, Threshold);
         }
@@ -105,14 +108,14 @@ namespace Tests
         public void GetDifferencesAsync_LeftIsNull_ThrowsArgumentNullException()
         {
             Assert.ThrowsAsync<ArgumentNullException>(async () =>
-                await _comparer.GetDifferencesAsync(null, new Bitmap(Width, Height)).IterateToListAsync());
+                await _comparer.GetDifferencesAsync(null, new Bitmap(Width, Height), _lockObject).IterateToListAsync());
         }
 
         [Test]
         public void GetDifferencesAsync_RightIsNull_ThrowsArgumentNullException()
         {
             Assert.ThrowsAsync<ArgumentNullException>(async () =>
-                await _comparer.GetDifferencesAsync(new Bitmap(Width, Height), null).IterateToListAsync());
+                await _comparer.GetDifferencesAsync(new Bitmap(Width, Height), null, _lockObject).IterateToListAsync());
         }
 
         [Test]
@@ -120,21 +123,21 @@ namespace Tests
         {
             Assert.ThrowsAsync<ArgumentException>(async () =>
                 await _comparer.GetDifferencesAsync(new Bitmap(Width, Height),
-                    new Bitmap(Width + 1, Height + 1)).IterateToListAsync());
+                    new Bitmap(Width + 1, Height + 1), _lockObject).IterateToListAsync());
         }
 
         [Test]
         public void GetDifferencesAsync_SizeOfLeftAndRightIsZero_ThrowsArgumentException()
         {
             Assert.ThrowsAsync<ArgumentException>(async () =>
-                await _comparer.GetDifferencesAsync(new Bitmap(0, 0), new Bitmap(0, 0)).IterateToListAsync());
+                await _comparer.GetDifferencesAsync(new Bitmap(0, 0), new Bitmap(0, 0), _lockObject).IterateToListAsync());
         }
 
         [Test]
         public void GetDifferencesAsync_CallsPixelComparerForEveryPixel()
         {
             _pixelComparerMock.Setup(p => p.PixelEquals(It.IsAny<Color>(), It.IsAny<Color>())).Returns(true);
-            var _ = _comparer.GetDifferencesAsync(new Bitmap(Width, Height), new Bitmap(Width, Height))
+            var _ = _comparer.GetDifferencesAsync(new Bitmap(Width, Height), new Bitmap(Width, Height), _lockObject)
                 .IterateToListAsync()
                 .Result;
 
@@ -148,7 +151,7 @@ namespace Tests
             _pixelComparerMock.Setup(p => p.PixelEquals(It.IsAny<Color>(), It.IsAny<Color>(), It.IsAny<int>()))
                 .Returns(true);
 
-            Assert.IsEmpty(_comparer.GetDifferencesAsync(new Bitmap(Width, Height), new Bitmap(Width, Height))
+            Assert.IsEmpty(_comparer.GetDifferencesAsync(new Bitmap(Width, Height), new Bitmap(Width, Height), _lockObject)
                 .IterateToListAsync()
                 .Result);
         }
@@ -159,7 +162,7 @@ namespace Tests
             _pixelComparerMock.Setup(p => p.PixelEquals(It.IsAny<Color>(), It.IsAny<Color>(), It.IsAny<int>()))
                 .Returns(false);
 
-            var result = _comparer.GetDifferencesAsync(new Bitmap(Width, Height), new Bitmap(Width, Height))
+            var result = _comparer.GetDifferencesAsync(new Bitmap(Width, Height), new Bitmap(Width, Height), _lockObject)
                 .IterateToListAsync()
                 .Result;
 
@@ -178,7 +181,7 @@ namespace Tests
             _pixelComparerMock.Setup(p => p.PixelEquals(It.IsAny<Color>(), It.IsAny<Color>(), It.IsAny<int>())).Returns(
                 () => ++calls > callsLimit);
 
-            var result = _comparer.GetDifferencesAsync(new Bitmap(Width, Height), new Bitmap(Width, Height))
+            var result = _comparer.GetDifferencesAsync(new Bitmap(Width, Height), new Bitmap(Width, Height), _lockObject)
                 .IterateToListAsync()
                 .Result;
 

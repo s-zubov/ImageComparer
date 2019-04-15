@@ -9,6 +9,6 @@ namespace ImageComparer
         
         IEnumerable<RectangleF> GetDifferences(Image left, Image right);
 
-        IAsyncEnumerable<RectangleF> GetDifferencesAsync(Image left, Image right);
+        IAsyncEnumerable<RectangleF> GetDifferencesAsync(Image left, Image right, object lockObject);
     }
 }

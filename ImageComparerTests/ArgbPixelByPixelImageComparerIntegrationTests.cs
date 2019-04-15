@@ -22,9 +22,12 @@ namespace Tests
 
         private const int GreaterThanThresholdValue = Value + Threshold + 1;
 
+        private object _lockObject;
+
         [SetUp]
         public void Setup()
         {
+            _lockObject = new object();   
             _comparer = new PixelByPixelImageComparer(new ArgbPixelComparer(), Threshold);
             _rnd = new Random(1);
         }
@@ -134,7 +137,7 @@ namespace Tests
         {
             var cyanRect = CreateSolidRectangle(Width, Height, Color.Cyan);
 
-            Assert.IsEmpty(_comparer.GetDifferencesAsync(cyanRect, cyanRect).IterateToListAsync().Result);
+            Assert.IsEmpty(_comparer.GetDifferencesAsync(cyanRect, cyanRect, _lockObject).IterateToListAsync().Result);
         }
 
         [Test]
@@ -146,7 +149,7 @@ namespace Tests
             var leftRect = CreateSolidRectangle(Width, Height, leftColor);
             var rightRect = CreateSolidRectangle(Width, Height, rightColor);
 
-            var result = _comparer.GetDifferencesAsync(leftRect, rightRect).IterateToListAsync().Result;
+            var result = _comparer.GetDifferencesAsync(leftRect, rightRect, _lockObject).IterateToListAsync().Result;
 
             Assert.AreEqual(Width * Height, result.Count);
             
@@ -164,7 +167,7 @@ namespace Tests
             var leftRect = CreateSolidRectangle(Width, Height, leftColor);
             var rightRect = CreateSolidRectangle(Width, Height, rightColor);
 
-            var result = _comparer.GetDifferencesAsync(leftRect, rightRect).IterateToListAsync().Result;
+            var result = _comparer.GetDifferencesAsync(leftRect, rightRect, _lockObject).IterateToListAsync().Result;
 
             Assert.AreEqual(Width * Height, result.Count);
             
@@ -182,7 +185,7 @@ namespace Tests
             var leftRect = CreateSolidRectangle(Width, Height, leftColor);
             var rightRect = CreateSolidRectangle(Width, Height, rightColor);
 
-            var result = _comparer.GetDifferencesAsync(leftRect, rightRect).IterateToListAsync().Result;
+            var result = _comparer.GetDifferencesAsync(leftRect, rightRect, _lockObject).IterateToListAsync().Result;
             
             Assert.AreEqual(Width * Height, result.Count);
             
@@ -207,7 +210,7 @@ namespace Tests
                     bmMagentaPixelsOnCyanBg.SetPixel(x, y, Color.Magenta);
                 }
 
-            var result = _comparer.GetDifferencesAsync(cyanRect, magentaPixelsOnCyanBg).IterateToListAsync().Result;
+            var result = _comparer.GetDifferencesAsync(cyanRect, magentaPixelsOnCyanBg, _lockObject).IterateToListAsync().Result;
             
             Assert.AreEqual(randomPointsCount, result.Count);
             

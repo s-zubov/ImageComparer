@@ -43,7 +43,7 @@ namespace ImageComparer
                 .Select(p => ScaleRectangle(p, xTransformFactor, yTransformFactor));
         }
 
-        public async IAsyncEnumerable<RectangleF> GetDifferencesAsync(Image left, Image right)
+        public async IAsyncEnumerable<RectangleF> GetDifferencesAsync(Image left, Image right, object lockObject)
         {
             if (left == null)
                 throw new ArgumentNullException(nameof(left));
@@ -51,22 +51,29 @@ namespace ImageComparer
             if (right == null)
                 throw new ArgumentNullException(nameof(right));
 
-            if (left.Size != right.Size)
-                throw new ArgumentException("Source images must be of the same size.");
+            float xTransformFactor;
+            float yTransformFactor;
+            Bitmap hashLeft;
+            Bitmap hashRight;
+            lock (lockObject)
+            {
+                if (left.Size != right.Size)
+                    throw new ArgumentException("Source images must be of the same size.");
 
-            var xTransformFactor = (float) left.Width / XSplit;
-            var yTransformFactor = (float) left.Height / YSplit;
+                xTransformFactor = (float) left.Width / XSplit;
+                yTransformFactor = (float) left.Height / YSplit;
 
-            var hashLeft = new Bitmap(left, new Size(XSplit, YSplit));
-            var hashRight = new Bitmap(right, new Size(XSplit, YSplit));
+                hashLeft = new Bitmap(left, new Size(XSplit, YSplit));
+                hashRight = new Bitmap(right, new Size(XSplit, YSplit));
+            }
 
-            var differences = _pixelByPixelImageComparer.GetDifferencesAsync(hashLeft, hashRight);
+            var differences = _pixelByPixelImageComparer.GetDifferencesAsync(hashLeft, hashRight, lockObject);
 
             await foreach (var rectangle in differences)
                 yield return ScaleRectangle(rectangle, xTransformFactor, yTransformFactor);
         }
 
-        private RectangleF ScaleRectangle(RectangleF rectangle, float xTransformFactor, float yTransformFactor)
+        private static RectangleF ScaleRectangle(RectangleF rectangle, float xTransformFactor, float yTransformFactor)
         {
             return new RectangleF(rectangle.X * xTransformFactor, rectangle.Y * yTransformFactor,
                 rectangle.Width * xTransformFactor, rectangle.Height * yTransformFactor);
