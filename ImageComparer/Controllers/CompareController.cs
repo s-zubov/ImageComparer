@@ -17,7 +17,7 @@ namespace ImageComparer.Controllers
             _imageComparerManager = imageComparerManager;
         }
 
-        [HttpPost("s")]
+        [HttpPost]
         public IActionResult Process(List<IFormFile> files)
         {
             if (files.Count != 2)
