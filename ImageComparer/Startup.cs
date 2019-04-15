@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using ImageComparer.Algorithms;
+using ImageComparer.Storage;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -20,8 +22,14 @@ namespace ImageComparer
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
-            services.AddTransient<IPixelComparerAlgorithm, ArgbPixelComparerAlgorithm>();
-//            services.AddTransient<IImageComparerAlgorithm>(provider => new GridImageComparerAlgorithm(new PixelByPixelImageComparerAlgorithm(services.), ));
+            
+            services.AddTransient<IImageComparerAlgorithm>(provider =>
+                new GridImageComparerAlgorithm(
+                    new PixelByPixelImageComparerAlgorithm(new ArgbPixelComparerAlgorithm()), 32,
+                    32));
+            services.AddTransient<IImageStorage, InnerImageStorage>();
+            services.AddTransient<IImagePainter, ImagePainter>();
+            services.AddTransient<IImageComparerManager, ImageComparerManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

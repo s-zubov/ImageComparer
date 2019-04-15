@@ -15,7 +15,12 @@ namespace ImageComparer
 
         private readonly IImagePainter _painter;
 
-        private readonly ConcurrentDictionary<Guid, ProcessingState> _states;
+        private static readonly ConcurrentDictionary<Guid, ProcessingState> States;
+
+        static ImageComparerManager()
+        {
+            States = new ConcurrentDictionary<Guid, ProcessingState>();
+        }
 
         public ImageComparerManager(IImageComparerAlgorithm comparer, IImagePainter painter, IImageStorage imageStorage)
         {
@@ -24,8 +29,6 @@ namespace ImageComparer
             _painter = painter;
 
             _imageStorage = imageStorage;
-
-            _states = new ConcurrentDictionary<Guid, ProcessingState>();
         }
 
         public Guid Process(Bitmap left, Bitmap right, int threshold)
@@ -54,11 +57,11 @@ namespace ImageComparer
 
             Task.Run(async () =>
             {
-                _states.TryAdd(guid, ProcessingState.InProgress);
+                States.TryAdd(guid, ProcessingState.InProgress);
                 await _painter.DrawDifferencesAsync(copy,
                     _comparer.GetDifferencesAsync(left, right, threshold, new object()),
                     copyLock);
-                _states.TryUpdate(guid, ProcessingState.Completed, ProcessingState.InProgress);
+                States.TryUpdate(guid, ProcessingState.Completed, ProcessingState.InProgress);
                 OnImageProcessed(new ImageProcessedEventArgs(guid));
             });
 
@@ -74,7 +77,7 @@ namespace ImageComparer
 
         public ProcessingState GetState(Guid guid)
         {
-            if (!_states.TryGetValue(guid, out var state))
+            if (!States.TryGetValue(guid, out var state))
                 throw new InvalidOperationException($"Entity not found: '{guid}'");
 
             return state;

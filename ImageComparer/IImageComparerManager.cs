@@ -10,6 +10,8 @@ namespace ImageComparer
         Guid ProcessInBackground(Bitmap left, Bitmap right, int threshold);
         
         Bitmap GetImage(Guid guid);
+
+        ProcessingState GetState(Guid guid);
         
         event ImageProcessedEventHandler ImageProcessed;
     }

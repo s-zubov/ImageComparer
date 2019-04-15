@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -18,9 +19,9 @@ namespace ImageComparer
             Width = width;
         }
 
-        public Color Color { get; set; }
+        public Color Color { get; set; } = Color.Red;
 
-        public int Width { get; set; }
+        public int Width { get; set; } = 4;
 
         public void DrawDifferences(Bitmap image, IEnumerable<RectangleF> differences)
         {
