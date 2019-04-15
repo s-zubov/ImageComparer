@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
-namespace ImageComparer
+namespace ImageComparer.Algorithms
 {
     public class GridImageComparerAlgorithm : IImageComparerAlgorithm
     {
@@ -20,9 +20,7 @@ namespace ImageComparer
 
         public int YSplit { get; }
 
-        public int Threshold => _innerImageComparerAlgorithm.Threshold;
-
-        public IEnumerable<RectangleF> GetDifferences(Bitmap left, Bitmap right)
+        public IEnumerable<RectangleF> GetDifferences(Bitmap left, Bitmap right, int threshold)
         {
             if (left == null)
                 throw new ArgumentNullException(nameof(left));
@@ -39,11 +37,12 @@ namespace ImageComparer
             var hashLeft = new Bitmap(left, new Size(XSplit, YSplit));
             var hashRight = new Bitmap(right, new Size(XSplit, YSplit));
 
-            return _innerImageComparerAlgorithm.GetDifferences(hashLeft, hashRight)
+            return _innerImageComparerAlgorithm.GetDifferences(hashLeft, hashRight, threshold)
                 .Select(p => ScaleRectangle(p, xTransformFactor, yTransformFactor));
         }
 
-        public async IAsyncEnumerable<RectangleF> GetDifferencesAsync(Bitmap left, Bitmap right, object lockObject)
+        public async IAsyncEnumerable<RectangleF> GetDifferencesAsync(Bitmap left, Bitmap right, int threshold,
+            object lockObject)
         {
             if (left == null)
                 throw new ArgumentNullException(nameof(left));
@@ -67,7 +66,8 @@ namespace ImageComparer
                 hashRight = new Bitmap(right, new Size(XSplit, YSplit));
             }
 
-            var differences = _innerImageComparerAlgorithm.GetDifferencesAsync(hashLeft, hashRight, lockObject);
+            var differences =
+                _innerImageComparerAlgorithm.GetDifferencesAsync(hashLeft, hashRight, threshold, lockObject);
 
             await foreach (var rectangle in differences)
                 yield return ScaleRectangle(rectangle, xTransformFactor, yTransformFactor);

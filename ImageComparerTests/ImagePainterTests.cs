@@ -8,11 +8,19 @@ using ImageComparer;
 using Moq;
 using NUnit.Framework;
 
-namespace Tests
+namespace ImageComparerTests
 {
     public class ImagePainterTests
     {
+        private const int Width = 1;
+
+        private readonly Color _color = Color.Red;
+
+        private Bitmap _image;
+        
         private IImagePainter _imagePainter;
+
+        private object _lockObject;
 
         [SetUp]
         public void SetUp()
@@ -21,14 +29,6 @@ namespace Tests
             _image = new Bitmap(100, 100);
             _lockObject = new object();
         }
-
-        private readonly Color _color = Color.Red;
-
-        private const int Width = 1;
-
-        private Bitmap _image;
-
-        private object _lockObject;
 
         [Test]
         public void DrawDifferences_ImageIsNull_ThrowsArgumentNullException()
@@ -49,9 +49,9 @@ namespace Tests
         {
             var copy = new Bitmap(_image);
             _imagePainter.DrawDifferences(copy, Enumerable.Empty<RectangleF>());
-            
+
             Assert.AreEqual(_image.Size, copy.Size);
-            for(var xIndex = 0; xIndex < _image.Width; xIndex++)
+            for (var xIndex = 0; xIndex < _image.Width; xIndex++)
             for (var yIndex = 0; yIndex < _image.Height; yIndex++)
                 Assert.AreEqual(_image.GetPixel(xIndex, yIndex).ToArgb(), copy.GetPixel(xIndex, yIndex).ToArgb());
         }
@@ -61,14 +61,14 @@ namespace Tests
         {
             var copy = new Bitmap(_image);
             _imagePainter.DrawDifferences(copy, new[] {new RectangleF(0, 0, 1, 1)});
-            
+
             Assert.AreEqual(_image.Size, copy.Size);
-            for(var xIndex = 0; xIndex < _image.Width; xIndex++)
+            for (var xIndex = 0; xIndex < _image.Width; xIndex++)
             for (var yIndex = 0; yIndex < _image.Height; yIndex++)
                 Assert.AreEqual(xIndex < 2 && yIndex < 2 ? _color.ToArgb() : _image.GetPixel(xIndex, yIndex).ToArgb(),
                     copy.GetPixel(xIndex, yIndex).ToArgb());
         }
-        
+
         [Test]
         public void DrawDifferencesAsync_ImageIsNull_ThrowsArgumentNullException()
         {
@@ -77,7 +77,7 @@ namespace Tests
             asyncEnumerableMock.Setup(p => p.GetAsyncEnumerator(It.IsAny<CancellationToken>()))
                 .Returns(() => asyncEnumeratorMock.Object);
             asyncEnumeratorMock.Setup(p => p.MoveNextAsync()).ReturnsAsync(() => false);
-            
+
             Assert.ThrowsAsync<ArgumentNullException>(async () =>
                 await _imagePainter.DrawDifferencesAsync(null, asyncEnumerableMock.Object, _lockObject));
         }
@@ -99,9 +99,9 @@ namespace Tests
             asyncEnumeratorMock.Setup(p => p.MoveNextAsync()).ReturnsAsync(() => false);
             var copy = new Bitmap(_image);
             await _imagePainter.DrawDifferencesAsync(copy, asyncEnumerableMock.Object, _lockObject);
-            
+
             Assert.AreEqual(_image.Size, copy.Size);
-            for(var xIndex = 0; xIndex < _image.Width; xIndex++)
+            for (var xIndex = 0; xIndex < _image.Width; xIndex++)
             for (var yIndex = 0; yIndex < _image.Height; yIndex++)
                 Assert.AreEqual(_image.GetPixel(xIndex, yIndex).ToArgb(), copy.GetPixel(xIndex, yIndex).ToArgb());
         }
@@ -114,13 +114,15 @@ namespace Tests
             asyncEnumerableMock.Setup(p => p.GetAsyncEnumerator(It.IsAny<CancellationToken>()))
                 .Returns(() => asyncEnumeratorMock.Object);
             var returned = false;
-            asyncEnumeratorMock.Setup(p => p.MoveNextAsync()).ReturnsAsync(() => !returned).Callback(() => returned = true);
+            asyncEnumeratorMock.Setup(p => p.MoveNextAsync()).ReturnsAsync(() => !returned)
+                .Callback(() => returned = true);
             asyncEnumeratorMock.Setup(p => p.Current).Returns(() => new RectangleF(0, 0, 1, 1));
             var copy = new Bitmap(_image);
-            await _imagePainter.DrawDifferencesAsync(copy, asyncEnumerableMock.Object, _lockObject).ConfigureAwait(false);
-            
+            await _imagePainter.DrawDifferencesAsync(copy, asyncEnumerableMock.Object, _lockObject)
+                .ConfigureAwait(false);
+
             Assert.AreEqual(_image.Size, copy.Size);
-            for(var xIndex = 0; xIndex < _image.Width; xIndex++)
+            for (var xIndex = 0; xIndex < _image.Width; xIndex++)
             for (var yIndex = 0; yIndex < _image.Height; yIndex++)
                 Assert.AreEqual(xIndex < 2 && yIndex < 2 ? _color.ToArgb() : _image.GetPixel(xIndex, yIndex).ToArgb(),
                     copy.GetPixel(xIndex, yIndex).ToArgb());

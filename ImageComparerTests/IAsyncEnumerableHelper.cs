@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
 using System.Threading.Tasks;
 
-namespace Tests
+namespace ImageComparerTests
 {
     public static class IAsyncEnumerableHelper
     {

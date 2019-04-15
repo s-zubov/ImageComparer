@@ -2,6 +2,8 @@ using System;
 using System.Collections.Concurrent;
 using System.Drawing;
 using System.Threading.Tasks;
+using ImageComparer.Algorithms;
+using ImageComparer.Storage;
 
 namespace ImageComparer
 {
@@ -26,7 +28,7 @@ namespace ImageComparer
             _states = new ConcurrentDictionary<Guid, ProcessingState>();
         }
 
-        public Guid Process(Bitmap left, Bitmap right)
+        public Guid Process(Bitmap left, Bitmap right, int threshold)
         {
             if (left == null)
                 throw new ArgumentNullException(nameof(left));
@@ -34,11 +36,11 @@ namespace ImageComparer
             if (right == null)
                 throw new ArgumentNullException(nameof(right));
 
-            _painter.DrawDifferences(left, _comparer.GetDifferences(left, right));
+            _painter.DrawDifferences(left, _comparer.GetDifferences(left, right, threshold));
             return _imageStorage.Create(new BitmapAndLock(left, new object()));
         }
 
-        public Guid ProcessInBackground(Bitmap left, Bitmap right)
+        public Guid ProcessInBackground(Bitmap left, Bitmap right, int threshold)
         {
             if (left == null)
                 throw new ArgumentNullException(nameof(left));
@@ -53,7 +55,8 @@ namespace ImageComparer
             Task.Run(async () =>
             {
                 _states.TryAdd(guid, ProcessingState.InProgress);
-                await _painter.DrawDifferencesAsync(copy, _comparer.GetDifferencesAsync(left, right, new object()),
+                await _painter.DrawDifferencesAsync(copy,
+                    _comparer.GetDifferencesAsync(left, right, threshold, new object()),
                     copyLock);
                 _states.TryUpdate(guid, ProcessingState.Completed, ProcessingState.InProgress);
                 OnImageProcessed(new ImageProcessedEventArgs(guid));

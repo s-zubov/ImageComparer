@@ -1,18 +1,16 @@
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Drawing;
 
-namespace ImageComparer
+namespace ImageComparer.Storage
 {
-    public class ImageStorage : IImageStorage
+    public class InnerImageStorage : IImageStorage
     {
-        static ImageStorage()
+        private static readonly ConcurrentDictionary<Guid, BitmapAndLock> Images;
+
+        static InnerImageStorage()
         {
             Images = new ConcurrentDictionary<Guid, BitmapAndLock>();
         }
-
-        private static readonly ConcurrentDictionary<Guid, BitmapAndLock> Images;
 
         public Guid Create(BitmapAndLock bitmapAndLock)
         {
@@ -21,6 +19,7 @@ namespace ImageComparer
             {
                 // In case of guid collision
             }
+
             return guid;
         }
 
@@ -32,7 +31,7 @@ namespace ImageComparer
 
         public void Delete(Guid guid)
         {
-            if(!Images.ContainsKey(guid))
+            if (!Images.ContainsKey(guid))
                 throw new InvalidOperationException($"Entity not found: '{guid}'");
 
             Images.TryRemove(guid, out _);

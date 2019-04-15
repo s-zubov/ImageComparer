@@ -1,8 +1,8 @@
 using System.Drawing;
-using ImageComparer;
+using ImageComparer.Algorithms;
 using NUnit.Framework;
 
-namespace Tests
+namespace ImageComparerTests
 {
     public class ArgbPixelComparerTests
     {

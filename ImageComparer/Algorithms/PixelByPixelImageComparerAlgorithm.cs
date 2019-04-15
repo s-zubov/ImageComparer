@@ -1,23 +1,19 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Drawing;
 
-namespace ImageComparer
+namespace ImageComparer.Algorithms
 {
     public class PixelByPixelImageComparerAlgorithm : IImageComparerAlgorithm
     {
         private readonly IPixelComparerAlgorithm _pixelComparerAlgorithm;
 
-        public PixelByPixelImageComparerAlgorithm(IPixelComparerAlgorithm pixelComparerAlgorithm, int threshold)
+        public PixelByPixelImageComparerAlgorithm(IPixelComparerAlgorithm pixelComparerAlgorithm)
         {
             _pixelComparerAlgorithm = pixelComparerAlgorithm;
-            Threshold = threshold;
         }
 
-        public int Threshold { get; }
-
-        public IEnumerable<RectangleF> GetDifferences(Bitmap left, Bitmap right)
+        public IEnumerable<RectangleF> GetDifferences(Bitmap left, Bitmap right, int threshold)
         {
             if (left == null)
                 throw new ArgumentNullException(nameof(left));
@@ -30,11 +26,12 @@ namespace ImageComparer
 
             for (var x = 0; x < left.Width; x++)
             for (var y = 0; y < left.Height; y++)
-                if (!_pixelComparerAlgorithm.PixelEquals(left.GetPixel(x, y), right.GetPixel(x, y), Threshold))
+                if (!_pixelComparerAlgorithm.PixelEquals(left.GetPixel(x, y), right.GetPixel(x, y), threshold))
                     yield return new Rectangle(x, y, 1, 1);
         }
 
-        public async IAsyncEnumerable<RectangleF> GetDifferencesAsync(Bitmap left, Bitmap right, object lockObject)
+        public async IAsyncEnumerable<RectangleF> GetDifferencesAsync(Bitmap left, Bitmap right, int threshold,
+            object lockObject)
         {
             if (left == null)
                 throw new ArgumentNullException(nameof(left));
@@ -49,7 +46,7 @@ namespace ImageComparer
 
                 for (var x = 0; x < left.Width; x++)
                 for (var y = 0; y < left.Height; y++)
-                    if (!_pixelComparerAlgorithm.PixelEquals(left.GetPixel(x, y), right.GetPixel(x, y), Threshold))
+                    if (!_pixelComparerAlgorithm.PixelEquals(left.GetPixel(x, y), right.GetPixel(x, y), threshold))
                         yield return new Rectangle(x, y, 1, 1);
             }
         }

@@ -1,13 +1,9 @@
 using System.Drawing;
 
-namespace ImageComparer
+namespace ImageComparer.Storage
 {
     public class BitmapAndLock
     {
-        public Bitmap Bitmap { get; set; }
-        
-        public object SyncRoot { get; set; }
-
         public BitmapAndLock()
         {
         }
@@ -17,5 +13,9 @@ namespace ImageComparer
             Bitmap = bitmap;
             SyncRoot = syncRoot;
         }
+
+        public Bitmap Bitmap { get; set; }
+
+        public object SyncRoot { get; set; }
     }
 }

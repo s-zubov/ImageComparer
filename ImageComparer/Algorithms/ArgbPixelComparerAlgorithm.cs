@@ -1,7 +1,7 @@
 using System;
 using System.Drawing;
 
-namespace ImageComparer
+namespace ImageComparer.Algorithms
 {
     public class ArgbPixelComparerAlgorithm : IPixelComparerAlgorithm
     {

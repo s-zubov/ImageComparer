@@ -1,14 +1,16 @@
 using System;
 using System.Drawing;
-using System.Threading.Tasks;
 
 namespace ImageComparer
 {
     public interface IImageComparerManager
     {
-        Guid Process(Bitmap left, Bitmap right);
-        Guid ProcessInBackground(Bitmap left, Bitmap right);
+        Guid Process(Bitmap left, Bitmap right, int threshold);
+        
+        Guid ProcessInBackground(Bitmap left, Bitmap right, int threshold);
+        
         Bitmap GetImage(Guid guid);
+        
         event ImageProcessedEventHandler ImageProcessed;
     }
 }
